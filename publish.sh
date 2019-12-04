@@ -7,6 +7,8 @@ inc=$(($version + 1))
 new_version=$(cat package.json | grep "version" | sed -E "s/(\"version\": \"0.0.)(.+)(\",)/\1$inc\3/g")
 sed -i -e "s/$og/$new_version/g" package.json
 
+rm javascript-console-log-utilities*
+
 # Publish to VSC Market
 vsce package
 vsce publish
