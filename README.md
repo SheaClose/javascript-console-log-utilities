@@ -17,6 +17,18 @@ With selection:
 - Press Cmd+Shift+L
 - The output (on a new line) will be: console.log('variable: ', variable);
 
+With multiple selections:
+
+- Highlight multiple variables
+- Press Cmd+Shift+L
+- The output (below each selection) will be: console.log('variable: ', variable);
+
+With selection and secondary cursor:
+
+- Highlight variable and a destination (via ctrl + click)
+- Press Cmd+Shift+L
+- The output will be placed at the secondary location.
+
 Without selection:
 
 - Press Cmd+Shift+L

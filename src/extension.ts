@@ -1,12 +1,13 @@
 import * as vscode from 'vscode';
+import { Selection, TextEditor } from 'vscode';
 export function activate(context: vscode.ExtensionContext) {
-  const insertLogStatement = vscode.commands.registerCommand(
+  var insertLogStatement = vscode.commands.registerCommand(
     'extension.insertLogStatement',
     executeInsertLogStatement
   );
   context.subscriptions.push(insertLogStatement);
 
-  const deleteAllLogStatements = vscode.commands.registerCommand(
+  var deleteAllLogStatements = vscode.commands.registerCommand(
     'extension.deleteAllLogStatements',
     executeDeleteAllLogStatements
   );
@@ -32,12 +33,11 @@ function cursorPlacement() {
 }
 
 function getAllLogStatements(document: any, documentText: any) {
-  let logStatements = [];
-
-  const logRegex = /console.(log|debug|info|warn|error|assert|dir|dirxml|trace|group|groupEnd|time|timeEnd|profile|profileEnd|count)\((.*)\);?/g;
-  let match;
+  var logStatements = [];
+  var logRegex = /console.(log|debug|info|warn|error|assert|dir|dirxml|trace|group|groupEnd|time|timeEnd|profile|profileEnd|count)\((.*)\);?/g;
+  var match;
   while ((match = logRegex.exec(documentText))) {
-    let matchRange = new vscode.Range(
+    var matchRange = new vscode.Range(
       document.positionAt(match.index),
       document.positionAt(match.index + match[0].length)
     );
@@ -69,14 +69,15 @@ function insertText(
   val: string,
   resolve: any = Promise.resolve
 ) {
-  const editor = vscode.window.activeTextEditor;
+  var editor = vscode.window.activeTextEditor;
   if (!editor) {
     vscode.window.showErrorMessage(
       "Can't insert log because no document is open"
     );
     return;
   }
-  const range = new vscode.Range(selection.start, selection.end);
+  var range = new vscode.Range(selection.start, selection.end);
+  console.log('range: ', { range, val });
 
   editor
     .edit(editBuilder => {
@@ -86,44 +87,73 @@ function insertText(
 }
 
 function executeInsertLogStatement() {
-  const editor = vscode.window.activeTextEditor;
-  if (!editor) {
+  if (vscode && vscode.window && vscode.window.activeTextEditor) {
+    var editor = vscode.window.activeTextEditor;
+  } else {
     return;
   }
-  const text = editor.selections
+  var text = editor.selections
     .map(sel => editor.document.getText(sel))
     .filter(c => c);
-  const placeholder = '';
-  const emptyInsert = `console.log(${placeholder})`;
-  text.length
-    ? vscode.commands
-        .executeCommand('editor.action.insertLineAfter')
-        .then(() => {
-          text.reduce((acc, _text, index) => {
-            return acc.then(res => {
-              return new Promise(resolve => {
-                const logToInsert = `console.log('${_text}: ', ${_text})`;
-                insertText(editor.selections[index], logToInsert, resolve);
-              });
-            });
-          }, Promise.resolve());
-        })
-    : insertText(editor.selection, emptyInsert);
+  var placeholder = '';
+  var emptyInsert = `console.log(${placeholder})`;
+  if (isDirectedLogger(editor)) {
+    var text_to_insert = editor.document.getText(editor.selection);
+    var log_to_insert = `console.log('${text_to_insert}: ', ${text_to_insert})`;
+    insertText(editor.selections[1], log_to_insert);
+    return;
+  } else if (text.length) {
+    vscode.commands.executeCommand('editor.action.insertLineAfter').then(() => {
+      text.reduce((acc, _text, index) => {
+        return acc.then(res => {
+          return new Promise(resolve => {
+            var logToInsert = `console.log('${_text}: ', ${_text})`;
+            insertText(editor.selections[index], logToInsert, resolve);
+          });
+        });
+      }, Promise.resolve());
+    });
+  } else {
+    editor.selections.reduce((acc, cur, index) => {
+      return acc.then(res => {
+        return new Promise(resolve => {
+          insertText(cur, emptyInsert, resolve);
+        });
+      });
+    }, Promise.resolve());
+  }
   cursorPlacement();
 }
 
 function executeDeleteAllLogStatements() {
-  const editor = vscode.window.activeTextEditor;
+  var editor = vscode.window.activeTextEditor;
   if (!editor) {
     return;
   }
 
-  const document = editor.document;
-  const documentText = editor.document.getText();
+  var document = editor.document;
+  var documentText = editor.document.getText();
 
-  let workspaceEdit = new vscode.WorkspaceEdit();
+  var workspaceEdit = new vscode.WorkspaceEdit();
 
-  const logStatements = getAllLogStatements(document, documentText);
+  var logStatements = getAllLogStatements(document, documentText);
 
   deleteFoundLogStatements(workspaceEdit, document.uri, logStatements);
+}
+
+/** In the case of a selected text and a secondary placed cursor, log to secondary location.
+ * isDirectedLogger(){} determines if selected text and empty cursor
+ */
+function isDirectedLogger({ selections }: TextEditor): boolean {
+  var selectionTypes = selections.map(
+    ({
+      start: { line: start_line, character: start_character },
+      end: { line: end_line, character: end_character }
+    }) => {
+      var isEmpty = start_line + start_character === end_line + end_character;
+      return isEmpty;
+    }
+  );
+  var allSelectionsMatch = selectionTypes.every((c, i, a) => c === a[0]);
+  return !allSelectionsMatch;
 }
