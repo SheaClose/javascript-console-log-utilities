@@ -12,3 +12,5 @@ rm javascript-console-log-utilities*
 # Publish to VSC Market
 vsce package
 vsce publish
+
+git commit -am "publishing to version: $version to vscode marketplace"
