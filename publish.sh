@@ -14,3 +14,4 @@ vsce package
 vsce publish
 
 git commit -am "publishing to version: $version to vscode marketplace"
+git push origin master
