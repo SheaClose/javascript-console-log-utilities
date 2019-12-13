@@ -13,6 +13,9 @@
   ],
   "activationEvents": [
     "onCommand:extension.insertLogStatement",
+    "onCommand:extension.insertInfoStatement",
+    "onCommand:extension.insertWarnStatement",
+    "onCommand:extension.insertErrorStatement",
     "onCommand:extension.deleteAllLogStatements"
   ],
   "main": "./out/extension",
@@ -23,6 +26,18 @@
         "title": "Insert Log Statement"
       },
       {
+        "command": "extension.insertInfoStatement",
+        "title": "Insert Info Statement"
+      },
+      {
+        "command": "extension.insertWarnStatement",
+        "title": "Insert Warn Statement"
+      },
+      {
+        "command": "extension.insertErrorStatement",
+        "title": "Insert Error Statement"
+      },
+      {
         "command": "extension.deleteAllLogStatements",
         "title": "Delete all console.log statements"
       }
@@ -30,14 +45,33 @@
     "keybindings": [
       {
         "command": "extension.insertLogStatement",
-        "key": "shift+ctrl+l",
+        "key": "shift+Win+l",
         "mac": "shift+cmd+l",
         "when": "editorTextFocus"
       },
       {
+        "command": "extension.insertInfoStatement",
+        "key": "shift+Win+alt+l",
+        "mac": "shift+cmd+alt+l",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.insertWarnStatement",
+        "key": "ctrl+shift+Win+l",
+        "mac": "ctrl+shift+cmd+l",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.insertErrorStatement",
+        "key": "ctrl+alt+Win+l",
+        "mac": "ctrl+alt+cmd+l",
+        "when": "editorTextFocus"
+      },
+      {
         "command": "extension.deleteAllLogStatements",
-        "key": "shift+ctrl+d",
-        "mac": "shift+cmd+d"
+        "key": "shift+Win+d",
+        "mac": "shift+cmd+d",
+        "when": "editorTextFocus"
       }
     ]
   },
@@ -60,5 +94,9 @@
     "id": "332c248b-f120-4847-b5e2-62391cde4a20",
     "publisherDisplayName": "sheaclose",
     "publisherId": "7f6f8173-f585-43e5-94ec-62831177dac3"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.14.149",
+    "lodash": "^4.17.15"
   }
 }
