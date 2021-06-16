@@ -2,7 +2,7 @@
   "name": "convert-input-to-get-set",
   "displayName": "convert-input-to-get-set",
   "description": "Extension for Angular development, allows for converting @Input() properties to getter/setter functions",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "publisher": "sheaclose",
   "engines": {
     "vscode": "^1.34.0"

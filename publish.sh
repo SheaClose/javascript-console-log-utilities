@@ -13,8 +13,10 @@ rm convert-input-to-get-set*
 # Publish to VSC Market
 vsce package
 
-# If this fails, got to https://marketplace.visualstudio.com/manage/publishers/sheaclose 
-# login with hotmail account and manually publish .vsix file
+# If this fails, got to https://dev.azure.com/sheaclose/_usersSettings/tokens 
+# Login with hotmail account.
+# Renew token for javascript-console-log-utilities-v2
+# In the console enter `vsce login sheaclose` and update the PAT with the newly generated token.
 vsce publish 
 
 git commit -am "publishing to version: $version to vscode marketplace"
