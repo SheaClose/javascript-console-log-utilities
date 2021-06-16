@@ -1,10 +1,9 @@
-import * as vscode from 'vscode';
-import { Selection, TextEditorEdit } from 'vscode';
+import { Selection, TextEditorEdit, commands, ExtensionContext, window, Range } from 'vscode';
 
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: ExtensionContext) {
   context.subscriptions.push(
-    vscode.commands.registerCommand('extension.convertInputToGetSet', () => {
-      const activeTextEditor = vscode.window?.activeTextEditor;
+    commands.registerCommand('extension.convertInputToGetSet', () => {
+      const activeTextEditor = window?.activeTextEditor;
       if (!activeTextEditor) {
         return;
       }
@@ -15,7 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
       const textToInsert = setText(text, type);
       if (rest?.length) return;
       if (!text) return;
-      const range = new vscode.Range(lineRange.start, lineRange.end);
+      const range = new Range(lineRange.start, lineRange.end);
       return activeTextEditor.edit((editBuilder: TextEditorEdit) => {
         editBuilder.replace(range, textToInsert);
       });
@@ -26,7 +25,7 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {}
 
 function setText(text: string, type: string) {
-  return `_${text}: ${type};
+  return `  _${text}: ${type};
   @Input() set ${text}( _${text}: ${type}) {
     console.log("_${text}: ", _${text});
     this._${text} = _${text}

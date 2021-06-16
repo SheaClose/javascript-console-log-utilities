@@ -12,7 +12,10 @@ rm convert-input-to-get-set*
 
 # Publish to VSC Market
 vsce package
-vsce publish
+
+# If this fails, got to https://marketplace.visualstudio.com/manage/publishers/sheaclose 
+# login with hotmail account and manually publish .vsix file
+vsce publish 
 
 git commit -am "publishing to version: $version to vscode marketplace"
 git push origin $(git branch | grep \* | cut -d ' ' -f2)
