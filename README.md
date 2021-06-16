@@ -1,6 +1,6 @@
 # javascript-console-log-utilities
 
-This is an extension of the vscode-js-console-utils by [@whtouche](https://twitter.com/whtouche)
+This extension is built upon the work of the vscode-js-console-utils by [@whtouche](https://twitter.com/whtouche)
 For the original extension go to the [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=whtouche.vscode-js-console-utils)
 
 # Installing

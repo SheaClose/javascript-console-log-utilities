@@ -8,10 +8,11 @@ new_version=$(cat package.json | grep "version" | sed -E "s/(\"version\": \"0.0.
 sed -i -e "s/$og/$new_version/g" package.json
 
 rm javascript-console-log-utilities*
+rm convert-input-to-get-set*
 
 # Publish to VSC Market
 vsce package
 vsce publish
 
 git commit -am "publishing to version: $version to vscode marketplace"
-git push origin master
+git push origin $(git branch | grep \* | cut -d ' ' -f2)
