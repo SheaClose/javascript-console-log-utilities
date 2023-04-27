@@ -31,14 +31,14 @@ function cursorPlacement(isMulti: boolean = false) {
     // release the selection caused by inserting
     vscode.commands.executeCommand('cursorMove', {
       to: 'right',
-      by: 'character',
+      by: 'line',
       value: 1,
     });
   }
   // position the cursor inside the parenthesis
   vscode.commands.executeCommand('cursorMove', {
     to: 'left',
-    by: 'character',
+    by: 'line',
     value: 1,
   });
 }
