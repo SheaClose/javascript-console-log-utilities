@@ -159,7 +159,7 @@ function invokeInsertBasedOnSelectionAndDestination(
         text.reduce((acc: Promise<any>, _text: string, index: number) => {
           return acc.then(() => {
             return new Promise(resolve => {
-              const logToInsert = `console.${logType}('updating? ${_text}: ', ${_text})`;
+              const logToInsert = `console.${logType}('${_text}: ', ${_text})`;
               insertText(activeTextEditor.selections[index], logToInsert, resolve);
             });
           });
