@@ -2,7 +2,7 @@
   "name": "javascript-console-log-utilities",
   "displayName": "javascript-console-log-utilities",
   "description": "An extension on the lovely extension created by whtouche [https://github.com/whtouche/vscode-js-console-utils]",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "publisher": "sheaclose",
   "repository": "https://github.com/SheaClose/javascript-console-log-utilities",
   "engines": {
