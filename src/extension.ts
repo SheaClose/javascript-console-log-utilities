@@ -1,25 +1,31 @@
-import * as vscode from 'vscode';
-import * as _ from 'lodash';
-import { Selection, TextEditor, TextEditorEdit } from 'vscode';
+import {
+  Selection,
+  TextEditor,
+  TextEditorEdit,
+  commands,
+  ExtensionContext,
+  Range,
+  workspace,
+  window,
+  WorkspaceEdit,
+} from 'vscode';
 import { Config } from './types';
-export function activate(context: vscode.ExtensionContext) {
+
+export function activate(context: ExtensionContext) {
   context.subscriptions.push(
-    vscode.commands.registerCommand('extension.insertLogStatement', () =>
+    commands.registerCommand('extension.insertLogStatement', () =>
       executeInsertLogStatement('log')
     ),
-    vscode.commands.registerCommand('extension.insertInfoStatement', () =>
+    commands.registerCommand('extension.insertInfoStatement', () =>
       executeInsertLogStatement('info')
     ),
-    vscode.commands.registerCommand('extension.insertWarnStatement', () =>
+    commands.registerCommand('extension.insertWarnStatement', () =>
       executeInsertLogStatement('warn')
     ),
-    vscode.commands.registerCommand('extension.insertErrorStatement', () =>
+    commands.registerCommand('extension.insertErrorStatement', () =>
       executeInsertLogStatement('error')
     ),
-    vscode.commands.registerCommand(
-      'extension.deleteAllLogStatements',
-      executeDeleteAllLogStatements
-    )
+    commands.registerCommand('extension.deleteAllLogStatements', executeDeleteAllLogStatements)
   );
 }
 
@@ -29,17 +35,17 @@ export function deactivate() {}
 function cursorPlacement(isMulti: boolean = false) {
   if (isMulti) {
     // release the selection caused by inserting
-    vscode.commands.executeCommand('cursorMove', {
+    commands.executeCommand('cursorMove', {
       to: 'right',
       by: 'line',
       value: 1,
     });
   }
   // position the cursor inside the parenthesis
-  vscode.commands.executeCommand('cursorMove', {
+  commands.executeCommand('cursorMove', {
     to: 'left',
     by: 'line',
-    value: 1
+    value: 1,
   });
 }
 
@@ -49,7 +55,7 @@ function getAllLogStatements(document: any, documentText: any) {
     /console.(log|debug|info|warn|error|assert|dir|dirxml|trace|group|groupEnd|time|timeEnd|profile|profileEnd|count)\((.*)\);?/g;
   let match;
   while ((match = logRegex.exec(documentText))) {
-    const matchRange = new vscode.Range(
+    const matchRange = new Range(
       document.positionAt(match.index),
       document.positionAt(match.index + match[0].length)
     );
@@ -65,20 +71,20 @@ function deleteFoundLogStatements(workspaceEdit: any, docUri: any, logs: any) {
     workspaceEdit.delete(docUri, log);
   });
 
-  vscode.workspace.applyEdit(workspaceEdit).then(() => {
+  workspace.applyEdit(workspaceEdit).then(() => {
     logs.length > 1
-      ? vscode.window.showInformationMessage(`${logs.length} console.logs deleted`)
-      : vscode.window.showInformationMessage(`${logs.length} console.log deleted`);
+      ? window.showInformationMessage(`${logs.length} console.logs deleted`)
+      : window.showInformationMessage(`${logs.length} console.log deleted`);
   });
 }
 
 function insertText(selection: Selection, val: string, resolve: any = Promise.resolve) {
-  const activeTextEditor = _.get(vscode, 'window.activeTextEditor');
+  const activeTextEditor = window?.activeTextEditor;
   if (!activeTextEditor) {
-    vscode.window.showErrorMessage("Can't insert log because no document is open");
+    window.showErrorMessage("Can't insert log because no document is open");
     return;
   }
-  const range = new vscode.Range(selection.start, selection.end);
+  const range = new Range(selection.start, selection.end);
   return activeTextEditor
     .edit((editBuilder: TextEditorEdit) => {
       editBuilder.replace(range, val);
@@ -87,12 +93,10 @@ function insertText(selection: Selection, val: string, resolve: any = Promise.re
 }
 
 function executeInsertLogStatement(logType: string) {
-  console.log('logType: ', logType);
-  const activeTextEditor = _.get(vscode, 'window.activeTextEditor');
+  const activeTextEditor = window?.activeTextEditor;
   if (!activeTextEditor) {
     return;
   }
-  const selections = activeTextEditor.selections;
   const text = activeTextEditor.selections.map((sel: Selection) =>
     activeTextEditor.document.getText(sel)
   );
@@ -104,7 +108,7 @@ function executeInsertLogStatement(logType: string) {
 }
 
 function executeDeleteAllLogStatements() {
-  const activeTextEditor = _.get(vscode, 'window.activeTextEditor');
+  const activeTextEditor = window?.activeTextEditor;
   if (!activeTextEditor) {
     return;
   }
@@ -112,7 +116,7 @@ function executeDeleteAllLogStatements() {
   const document = activeTextEditor.document;
   const documentText = activeTextEditor.document.getText();
 
-  const workspaceEdit = new vscode.WorkspaceEdit();
+  const workspaceEdit = new WorkspaceEdit();
 
   const logStatements = getAllLogStatements(document, documentText);
 
@@ -130,7 +134,7 @@ function getPositionAndDestinationConfig(text: string[], logType: string): Confi
     hasDestinationForLog,
     areEmptyInserts,
     emptyInsertTemplate,
-    text
+    text,
   };
 }
 
@@ -144,18 +148,18 @@ function invokeInsertBasedOnSelectionAndDestination(
     hasAtLeastOneSelection,
     hasDestinationForLog,
     areEmptyInserts,
-    emptyInsertTemplate
+    emptyInsertTemplate,
   } = config;
   // Determine selection type, and destination type.
   // ex1: single || multi selection, no destination;
   if (hasAtLeastOneSelection && !hasDestinationForLog) {
-    vscode.commands
+    commands
       .executeCommand('editor.action.insertLineAfter')
       .then(() => {
         text.reduce((acc: Promise<any>, _text: string, index: number) => {
-          return acc.then(res => {
+          return acc.then(() => {
             return new Promise(resolve => {
-              const logToInsert = `console.${logType}('${_text}: ', ${_text})`;
+              const logToInsert = `console.${logType}('updating? ${_text}: ', ${_text})`;
               insertText(activeTextEditor.selections[index], logToInsert, resolve);
             });
           });
@@ -186,9 +190,9 @@ function invokeInsertBasedOnSelectionAndDestination(
   // ex3: single || multi empty insert;
   if (areEmptyInserts && text.length > 0) {
     activeTextEditor.selections
-      .reduce((acc: Promise<any>, cur: Selection, index: number) => {
+      .reduce((acc: Promise<any>, cur: Selection) => {
         return acc.then(
-          res => new Promise(resolve => insertText(cur, emptyInsertTemplate, resolve))
+          () => new Promise(resolve => insertText(cur, emptyInsertTemplate, resolve))
         );
       }, Promise.resolve())
       .then(() => cursorPlacement());

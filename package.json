@@ -78,7 +78,6 @@
   "scripts": {
     "compile": "tsc -p ./",
     "lint": "tslint -p ./",
-    "postinstall": "node ./node_modules/vscode/bin/install",
     "publish": "./publish.sh",
     "vscode:prepublish": "npm run compile",
     "watch": "tsc -watch -p ./"
@@ -87,16 +86,12 @@
     "@types/node": "^10.14.17",
     "@types/vscode": "^1.34.0",
     "tslint": "^5.16.0",
-    "typescript": "^3.5.1",
-    "vscode": "^1.1.36"
+    "typescript": "^3.5.1"
   },
   "__metadata": {
     "id": "332c248b-f120-4847-b5e2-62391cde4a20",
     "publisherDisplayName": "sheaclose",
     "publisherId": "7f6f8173-f585-43e5-94ec-62831177dac3"
   },
-  "dependencies": {
-    "@types/lodash": "^4.14.149",
-    "lodash": "^4.17.21"
-  }
+  "dependencies": {}
 }
