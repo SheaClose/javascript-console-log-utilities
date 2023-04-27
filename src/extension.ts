@@ -39,7 +39,7 @@ function cursorPlacement(isMulti: boolean = false) {
   vscode.commands.executeCommand('cursorMove', {
     to: 'left',
     by: 'line',
-    value: 1,
+    value: 1
   });
 }
 
@@ -130,7 +130,7 @@ function getPositionAndDestinationConfig(text: string[], logType: string): Confi
     hasDestinationForLog,
     areEmptyInserts,
     emptyInsertTemplate,
-    text,
+    text
   };
 }
 
@@ -144,7 +144,7 @@ function invokeInsertBasedOnSelectionAndDestination(
     hasAtLeastOneSelection,
     hasDestinationForLog,
     areEmptyInserts,
-    emptyInsertTemplate,
+    emptyInsertTemplate
   } = config;
   // Determine selection type, and destination type.
   // ex1: single || multi selection, no destination;
