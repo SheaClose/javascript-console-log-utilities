@@ -26,24 +26,27 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {}
 
 /* Helper Functions */
-function cursorPlacement() {
-  // release the selection caused by inserting
-  vscode.commands.executeCommand('cursorMove', {
-    to: 'right',
-    by: 'line',
-    value: 1
-  });
+function cursorPlacement(isMulti: boolean = false) {
+  if (isMulti) {
+    // release the selection caused by inserting
+    vscode.commands.executeCommand('cursorMove', {
+      to: 'right',
+      by: 'character',
+      value: 1,
+    });
+  }
   // position the cursor inside the parenthesis
   vscode.commands.executeCommand('cursorMove', {
     to: 'left',
-    by: 'line',
-    value: 1
+    by: 'character',
+    value: 1,
   });
 }
 
 function getAllLogStatements(document: any, documentText: any) {
   const logStatements = [];
-  const logRegex = /console.(log|debug|info|warn|error|assert|dir|dirxml|trace|group|groupEnd|time|timeEnd|profile|profileEnd|count)\((.*)\);?/g;
+  const logRegex =
+    /console.(log|debug|info|warn|error|assert|dir|dirxml|trace|group|groupEnd|time|timeEnd|profile|profileEnd|count)\((.*)\);?/g;
   let match;
   while ((match = logRegex.exec(documentText))) {
     const matchRange = new vscode.Range(
@@ -127,7 +130,7 @@ function getPositionAndDestinationConfig(text: string[], logType: string): Confi
     hasDestinationForLog,
     areEmptyInserts,
     emptyInsertTemplate,
-    text
+    text,
   };
 }
 
@@ -141,7 +144,7 @@ function invokeInsertBasedOnSelectionAndDestination(
     hasAtLeastOneSelection,
     hasDestinationForLog,
     areEmptyInserts,
-    emptyInsertTemplate
+    emptyInsertTemplate,
   } = config;
   // Determine selection type, and destination type.
   // ex1: single || multi selection, no destination;
@@ -158,7 +161,7 @@ function invokeInsertBasedOnSelectionAndDestination(
           });
         }, Promise.resolve());
       })
-      .then(() => cursorPlacement());
+      .then(() => cursorPlacement(text.length > 1));
     return;
   }
   // ex2: single || multi selection, w/ destination;
